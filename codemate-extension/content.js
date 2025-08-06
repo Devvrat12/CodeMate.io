@@ -1,16 +1,23 @@
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === "EXTRACT_CODE") {
-    let title = document.querySelector("h1")?.innerText || "Untitled Problem";
-    let code = "";
+    try {
+      // Extract title
+      const title = Array.from(document.querySelectorAll('a[href^="/problems/"]'))
+        .find(a => a.innerText?.match(/^\d+\.\s+/))
+        ?.innerText?.replace(/^\d+\.\s+/, '') || "Untitled Problem";
 
-    // Try LeetCode editor
-    let leetEditor = document.querySelector('.view-lines');
-    if (leetEditor) {
-      code = leetEditor.innerText;
+      // Extract full description
+      const descriptionElement = document.querySelector('[data-track-load="description_content"]');
+      const description = descriptionElement ? descriptionElement.innerText : "Description not found.";
+
+      // Extract code lines from visible Monaco editor
+      let codeLines = Array.from(document.querySelectorAll('.view-line')).map(line => line.innerText);
+      let code = codeLines.join('\n');
+
+      sendResponse({ title, description, code });
+    } catch (err) {
+      sendResponse({ error: "Could not extract data from page." });
     }
-
-    // Add support for GFG, Codeforces etc. similarly if needed
-
-    sendResponse({ title, code });
   }
+  return true; // Required for async sendResponse
 });

@@ -1,12 +1,16 @@
 document.getElementById("analyze-btn").addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.tabs.sendMessage(tabs[0].id, { type: "EXTRACT_CODE" }, (response) => {
-      if (!response) return;
+      if (!response || response.error) {
+        document.getElementById("response").innerText = "❌ Error: Could not extract data from page.";
+        return;
+      }
 
       const action = document.getElementById("action").value;
       const requestBody = {
         problem_title: response.title,
         user_code: response.code,
+        description: response.description,  // 🔥 include the full description
         action: action
       };
 
