@@ -3,7 +3,11 @@
   "name": "CodeMate",
   "version": "1.0",
   "description": "Get hints, solutions, or optimized versions of your code instantly!",
-  "permissions": ["scripting", "activeTab", "storage"],
+  "permissions": ["activeTab", "scripting", "storage"],
+  "host_permissions": [
+    "https://*.leetcode.com/*",
+    "https://*.geeksforgeeks.org/*"
+  ],
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
@@ -17,8 +21,12 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.geeksforgeeks.org/*", "*://*.leetcode.com/*"],
-      "js": ["content.js"]
+      "matches": [
+        "https://*.leetcode.com/*",
+        "https://*.geeksforgeeks.org/*"
+      ],
+      "js": ["content.js"],
+      "run_at": "document_idle"
     }
   ],
   "icons": {
